@@ -32,9 +32,12 @@ namespace WebApplication.Controllers
 
         public async Task<ActionResult<Book>> UpdateBook(int id,Book b)
         {
-            db.Entry(b).State = EntityState.Modified;
-            await db.SaveChangesAsync();
-            return Ok();
+            using (var db = new stationaryContext())
+            {
+                db.Entry(b).State = EntityState.Modified;
+                await db.SaveChangesAsync();
+                return Ok(b);
+            }
         }
         [HttpDelete]
         [Route("{id}")]
