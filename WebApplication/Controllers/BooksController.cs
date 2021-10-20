@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication.KaniniModel;
+using WebApplication.Service;
 
 namespace WebApplication.Controllers
 {
@@ -13,41 +14,41 @@ namespace WebApplication.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
+        private readonly IBookServ<Book> serv;
+
+        public BooksController(IBookServ<Book> _serv)
+        {
+            serv = _serv;
+        }
+      
         public static stationaryContext db = new stationaryContext();
+
         [HttpGet]
         public async Task<IActionResult> GetAllBooks()
         {
-            return Ok(await db.Books.ToListAsync());
+
+            return Ok(await serv.GetAllBooks());
         }
         [HttpPost]
         public async  Task<IActionResult> InsertBook(Book b)
         {
-            db.Books.Add(b);
-            await db.SaveChangesAsync();
-            return Ok();
-
+            return Ok(await serv.InsertBook(b));
         }
         [HttpPut]
         [Route("{id}")]
 
         public async Task<ActionResult<Book>> UpdateBook(int id,Book b)
         {
-            using (var db = new stationaryContext())
-            {
-                db.Entry(b).State = EntityState.Modified;
-                await db.SaveChangesAsync();
-                return Ok(b);
-            }
+            return await serv.UpdateBook(id, b);
+
         }
         [HttpDelete]
         [Route("{id}")]
 
         public async Task<ActionResult<Book>> Delete(int id)
         {
-            Book b = db.Books.Find(id);
-            db.Books.Remove(b);
-            await db.SaveChangesAsync();
-            return Ok();
+            return await serv.DeleteBook(id);
+
 
         }
 
@@ -55,8 +56,9 @@ namespace WebApplication.Controllers
         [Route("{id}")]
         public async Task<ActionResult<Book>> GetBookById(int id)
         {
-            Book b = await db.Books.FindAsync(id);
-            return Ok(b);
+        
+                return await serv.GetById(id);
+            
         }
 
 

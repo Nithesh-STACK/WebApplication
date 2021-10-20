@@ -13,6 +13,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using WebApplication.KaniniModel;
+using WebApplication.Repository;
+using WebApplication.Service;
 
 namespace WebApplication
 {
@@ -28,7 +30,11 @@ namespace WebApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<stationaryContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))); 
+            services.AddDbContext<stationaryContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped<IBook<Book>, Book>();
+            services.AddScoped<IBookRepo<Book>, BookRepo>();
+            services.AddScoped<IBookServ<Book>, BookServ>();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
